@@ -3,6 +3,8 @@ package br.com.dio.desafio.dominio;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Iterator;
+import java.util.Optional;
 
 public class Dev
 {
@@ -58,18 +60,32 @@ public class Dev
 
 	public void progredir()
 	{
-		getConteudosInscritos().stream().findFirst()
-			.ifPresentOrElse(conteudo -> {
-				getConteudosInscritos().remove(conteudo);
-				adicionarConteudosConcluidos(conteudo);
-			}, () -> System.err.println("Nenhum conteúdo encontrado."));
+		Optional<Conteudo> conteudo = this.conteudosInscritos.stream().findFirst();
+		
+		if (conteudo.isPresent())
+		{
+			Conteudo c = conteudo.get();
+
+			this.conteudosInscritos.remove(c);
+			this.conteudosConcluidos.add(c);
+		}
+		else
+		{
+			System.err.println("Nenhum conteúdo encontrado.");
+		}
 	}
 
 	public double calcularTotalXP()
 	{
-        return getConteudosConcluidos().stream()
-			.mapToDouble(Conteudo::calcularXP)
-			.sum();
+		Iterator<Conteudo> iterator = getConteudosConcluidos().iterator();
+		double xp = 0;
+
+		while(iterator.hasNext())
+		{
+			xp += iterator.next().calcularXP();
+		}
+
+		return xp;
 	}
 
 	@Override
